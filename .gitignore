@@ -1,0 +1,6 @@
+src/node_modules/
+src/.env
+src/.env.development.local
+src/.env.production.local
+src/package-lock.json
+uploads/*
