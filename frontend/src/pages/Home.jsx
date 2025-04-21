@@ -22,13 +22,21 @@ const Home = () => {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem('token')
-        const response = await axios.get('http://localhost:3000/api/products', {
+        if (!token) {
+          navigate('/login')
+          return
+        }
+        const response = await axios.get('https://epita-server-sided-javascript.onrender.com/api/products', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
         setProducts(response.data)
       } catch (error) {
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token')
+          navigate('/login')
+        }
         toast.error('Failed to fetch products')
       } finally {
         setLoading(false)

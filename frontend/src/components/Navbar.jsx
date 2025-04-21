@@ -39,8 +39,9 @@ const Navbar = () => {
             textDecoration: 'none',
             color: 'inherit',
           }}
+          className="navbar-title"
         >
-          E-Commerce
+          Demi's Black Market
         </Typography>
         <Box>
           {isAuthenticated ? (

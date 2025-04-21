@@ -55,23 +55,34 @@ const ProductForm = () => {
         }
 
         if (isEdit) {
-          await axios.put(
+          const response = await axios.put(
             `https://epita-server-sided-javascript.onrender.com/api/products/${id}`,
             values,
             config
           )
-          toast.success('Product updated successfully')
+          toast.success(response.data.message || 'Product updated successfully')
         } else {
-          await axios.post(
+          const response = await axios.post(
             'https://epita-server-sided-javascript.onrender.com/api/products',
             values,
             config
           )
-          toast.success('Product created successfully')
+          toast.success(response.data.message || 'Product created successfully')
         }
         navigate('/')
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Operation failed')
+        console.error('Error:', error)
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          toast.error(error.response.data.message || 'Operation failed')
+        } else if (error.request) {
+          // The request was made but no response was received
+          toast.error('No response from server')
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          toast.error('Error setting up request')
+        }
       } finally {
         setLoading(false)
       }
@@ -104,7 +115,7 @@ const ProductForm = () => {
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography variant="h4" align="center" gutterBottom sx={{ mb: 6 }}>
           {isEdit ? 'Edit Product' : 'Create Product'}
         </Typography>
         <form onSubmit={formik.handleSubmit}>
