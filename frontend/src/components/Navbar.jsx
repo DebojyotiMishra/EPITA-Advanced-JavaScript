@@ -1,69 +1,48 @@
-import { useState, useEffect } from 'react'
-import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  Box,
-} from '@mui/material'
-import { ShoppingCart, Add } from '@mui/icons-material'
-import { toast } from 'react-toastify'
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    setIsAuthenticated(!!token)
-  }, [])
+  const { isAuthenticated, isAdmin, logout } = useAuth()
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    setIsAuthenticated(false)
-    toast.success('Logged out successfully')
+    logout()
     navigate('/')
   }
 
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography
-          variant="h6"
-          component={RouterLink}
-          to="/"
-          sx={{
-            flexGrow: 1,
-            textDecoration: 'none',
-            color: 'inherit',
-          }}
-          className="navbar-title"
-        >
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Demi's Black Market
         </Typography>
         <Box>
           {isAuthenticated ? (
             <>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/products/new"
-                startIcon={<Add />}
-              >
-                Add Product
-              </Button>
+              {isAdmin && (
+                <Button
+                  color="inherit"
+                  onClick={() => navigate('/products/new')}
+                  sx={{ mr: 2 }}
+                >
+                  Add Product
+                </Button>
+              )}
               <Button color="inherit" onClick={handleLogout}>
                 Logout
               </Button>
             </>
           ) : (
             <>
-              <Button color="inherit" component={RouterLink} to="/login">
+              <Button
+                color="inherit"
+                onClick={() => navigate('/login')}
+                sx={{ mr: 2 }}
+              >
                 Login
               </Button>
-              <Button color="inherit" component={RouterLink} to="/signup">
+              <Button color="inherit" onClick={() => navigate('/signup')}>
                 Signup
               </Button>
             </>

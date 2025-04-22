@@ -12,25 +12,25 @@ import {
 } from '@mui/material'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { useAuth } from '../context/AuthContext'
 
 const Home = () => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem('token')
-        if (!token) {
-          navigate('/login')
-          return
-        }
-        const response = await axios.get('https://epita-server-sided-javascript.onrender.com/api/products', {
+        const config = token ? {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        })
+        } : {}
+        
+        const response = await axios.get('https://epita-server-sided-javascript.onrender.com/api/products', config)
         setProducts(response.data)
       } catch (error) {
         if (error.response?.status === 401) {
@@ -43,7 +43,7 @@ const Home = () => {
       }
     }
     fetchProducts()
-  }, [])
+  }, [navigate])
 
   if (loading) {
     return (
@@ -84,13 +84,15 @@ const Home = () => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button
-                  size="small"
-                  color="primary"
-                  onClick={() => navigate(`/products/${product._id}/edit`)}
-                >
-                  Edit
-                </Button>
+                {isAuthenticated && (
+                  <Button
+                    size="small"
+                    color="primary"
+                    onClick={() => navigate(`/products/${product._id}/edit`)}
+                  >
+                    Edit
+                  </Button>
+                )}
               </CardActions>
             </Card>
           </Grid>

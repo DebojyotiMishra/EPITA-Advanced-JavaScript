@@ -1,7 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
-import * as yup from 'yup'
+import * as Yup from 'yup'
 import {
   Container,
   Paper,
@@ -10,44 +8,37 @@ import {
   Button,
   Box,
 } from '@mui/material'
-import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-
-const validationSchema = yup.object({
-  email: yup
-    .string()
-    .email('Enter a valid email')
-    .required('Email is required'),
-  password: yup
-    .string()
-    .min(6, 'Password should be of minimum 6 characters length')
-    .required('Password is required'),
-})
+import axios from 'axios'
+import { useAuth } from '../context/AuthContext'
 
 const Login = () => {
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
 
   const formik = useFormik({
     initialValues: {
       email: '',
       password: '',
     },
-    validationSchema: validationSchema,
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required'),
+      password: Yup.string().required('Password is required'),
+    }),
     onSubmit: async (values) => {
       try {
-        setLoading(true)
         const response = await axios.post(
           'https://epita-server-sided-javascript.onrender.com/api/users/login',
           values
         )
-        localStorage.setItem('token', response.data.token)
+        login(response.data.token)
         toast.success('Logged in successfully')
         navigate('/')
       } catch (error) {
         toast.error(error.response?.data?.message || 'Login failed')
-      } finally {
-        setLoading(false)
       }
     },
   })
@@ -58,7 +49,7 @@ const Login = () => {
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
-        <form onSubmit={formik.handleSubmit}>
+        <Box component="form" onSubmit={formik.handleSubmit}>
           <TextField
             fullWidth
             id="email"
@@ -82,18 +73,15 @@ const Login = () => {
             helperText={formik.touched.password && formik.errors.password}
             margin="normal"
           />
-          <Box mt={2}>
-            <Button
-              color="primary"
-              variant="contained"
-              fullWidth
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? 'Logging in...' : 'Login'}
-            </Button>
-          </Box>
-        </form>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3 }}
+          >
+            Login
+          </Button>
+        </Box>
       </Paper>
     </Container>
   )

@@ -6,10 +6,11 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import ProductForm from './pages/ProductForm'
 import PrivateRoute from './components/PrivateRoute'
+import { AuthProvider } from './context/AuthContext'
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <CssBaseline />
       <Navbar />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -35,7 +36,7 @@ function App() {
           />
         </Routes>
       </Container>
-    </>
+    </AuthProvider>
   )
 }
 
